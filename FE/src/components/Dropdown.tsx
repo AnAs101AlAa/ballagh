@@ -22,7 +22,7 @@ export default function Dropdown({options, selectedOption, onSelect} : {options:
                 <FaChevronDown className={`w-2.5 h-2.5 ${isOpen ? "rotate-180" : ""} transition-all`} />
                 {selectedOption}
             </button>
-            <div ref={dropdownRef} id="dropdown" className={`${isOpen ? "z-10 translate-y-10" : "-z-50 translate-y-0"} w-full border-t-0 border-2 border-(--border) group-hover:border-(--border-hover) bg-(--background) transition-all duration-200 ease-in-out absolute top-0 rounded-b-xl`}>
+            <div ref={dropdownRef} id="dropdown" className={`${isOpen ? "z-10 translate-y-10 opacity-100" : "-z-50 opacity-0 translate-y-0"} w-full border-t-0 border-2 border-(--border) group-hover:border-(--border-hover) bg-(--background) transition-all duration-200 ease-in-out absolute top-0 rounded-b-xl`}>
                 <ul className="py-2 text-sm" aria-labelledby="dropdownDefaultButton">
                     {options.map((option, index) => (
                         <li key={index} onClick={() => {onSelect(option); setIsOpen(false);}}>

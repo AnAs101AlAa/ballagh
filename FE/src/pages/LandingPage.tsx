@@ -24,10 +24,10 @@ export default function LandingPage() {
                 <p className={`text-center text-(--text-primary) font-medium text-[16px] md:text-[19px] lg:text-[22px] transition-all duration-300 ease-in-out ${triggerStarter > 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>اول منصة مصرية للتبليغ عن الجرائم بخصوصية و امان مطلق</p>
                 <div className={`flex md:flex-row flex-col justify-center items-center gap-4 transition-all duration-300 ease-in-out ${triggerStarter > 2 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"}`}>
                     <div className="lg:w-[40%] md:w-[45%] w-[96%] ">
-                        <Card icon={<VscRobot className="size-8"/>} title="المساعد الآلي" text="استخدم المساعد الآلي المدعم بالذكاء الاصطناعي لمساعدتك في التبليغ عن الجرائم بسهولة و دقة" buttonText="ابدأ الآن" onClick={() => {}} />
+                        <Card icon={<VscRobot className="size-8"/>} title="المساعد الآلي" text="استخدم المساعد الآلي المدعم بالذكاء الاصطناعي لمساعدتك في التبليغ عن الجرائم بسهولة و دقة" buttonText="ابدأ الآن" onClick={() => navigate("/AutoForm")} />
                     </div>
                     <div className="lg:w-[40%] md:w-[45%] w-[96%]">
-                        <Card icon={<FaWpforms className="size-8"/>} title="التبليغ اليدوي" text="املأ بيانات بلاغك يدويا لتحكم اكثر في تفاصيل و بيانات البلاغ في خطوات بسيطة" buttonText="ابدأ الآن" onClick={() => navigate("/form")} />
+                        <Card icon={<FaWpforms className="size-8"/>} title="التبليغ اليدوي" text="املأ بيانات بلاغك يدويا لتحكم اكثر في تفاصيل و بيانات البلاغ في خطوات بسيطة" buttonText="ابدأ الآن" onClick={() => navigate("/ManualForm")} />
                     </div>
                 </div>
             </div>
