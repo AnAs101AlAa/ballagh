@@ -2,10 +2,10 @@ import { ButtonTypes } from "../constants/presets";
 
 export default function Button({buttonText, onClick, type}: {buttonText: string, onClick: () => void, type: ButtonTypes}) {
     const stylePresets : Record<ButtonTypes, string> = {
-        primary: "bg-(--primary) border-(--border) hover:bg-(--text-secondary) hover:border-(--text-secondary) hover:text-(--text-primary) text-(--text-secondary)",
-        secondary: "bg-(--secondary) border-(--border) hover:bg-(--secondary-hover) text-(--text-secondary)",
-        tertiary: "bg-(--tertiary) border-(--border) hover:bg-(--tertiary-hover) text-(--text-tertiary)",
-        danger: 'bg-(--danger) border-(--border) hover:bg-(--danger) text-(--danger) hover:text-(--text-primary) hover:border-(--danger)'
+        primary: "bg-primary border-border hover:bg-text-secondary hover:border-text-secondary hover:text-primary text-text-secondary",
+        secondary: "bg-secondary border-border hover:bg-secondary-hover text-text-secondary",
+        tertiary: "bg-tertiary border-border hover:bg-tertiary-hover text-text-tertiary",
+        danger: 'bg-danger border-border hover:bg-danger text-danger hover:text-primary hover:border-danger'
     }
 
     return (
