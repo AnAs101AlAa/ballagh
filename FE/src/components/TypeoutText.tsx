@@ -1,6 +1,8 @@
 import {useState, useEffect} from 'react';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-export default function TypeOutText({ text, speed = 100, styles, delay = 0, segments=[] }: {text: string; speed?: number; styles: string, delay?: number, segments?: number[]}) {
+export default function TypeOutText({ text, speed = 100, styles, delay = 0, segments=[] }: {text: string; speed?: number; styles: string, delay?: number, segments?: number[]}) {    
     const fullText = text;
     const [displayedText, setDisplayedText] = useState("");
 
@@ -36,7 +38,9 @@ export default function TypeOutText({ text, speed = 100, styles, delay = 0, segm
 
     return (
         <div dir="rtl" className={styles}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {displayedText}
+        </ReactMarkdown>
         </div>
     )
 }
