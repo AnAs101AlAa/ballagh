@@ -10,6 +10,7 @@
   --color-border: #3d444d;
   --color-border-hover: #7b8897;
   --color-danger: #ea3c34;
+  --color-danger-hover: #ff645c;
   
   --animate-breathe: low 3s ease-in-out infinite;
   --animate-fade-in: fadein 0.3s ease-in-out;

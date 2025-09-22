@@ -1,5 +1,6 @@
 // src/lib/cryptoClient.ts
 import sodium from "libsodium-wrappers";
+import axios from "axios";
 
 export type Envelope = {
   ephemeral_pub: string; // client's ephemeral public key (base64)
@@ -109,3 +110,10 @@ export async function decryptServerResponse(
 
   return JSON.parse(sodium.to_string(plaintext));
 }
+
+async function fetchServerPubKey(): Promise<string> {
+  const resp = await axios.get("http://localhost:3000/api/server-pubkey");
+  return resp.data.x25519_pub as string;
+}
+
+export { fetchServerPubKey };

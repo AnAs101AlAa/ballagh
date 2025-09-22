@@ -5,6 +5,7 @@ import TypeOutText from "../components/TypeoutText";
 import { LuAudioLines } from "react-icons/lu";
 import UseChatbot from "../hooks/UseChatbot";
 import { FaXmark } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 export default function ChatbotPage() {
     const { sendPrompt } = UseChatbot();
@@ -14,6 +15,7 @@ export default function ChatbotPage() {
     const [messageFeed, setMessageFeed] = useState<{type: "user" | "bot", content: string}[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [renderIn, setRenderIn] = useState<boolean>(false);
+    const [sessionId, setSessionId] = useState<string>("");
 
     useEffect(() => {
         setTimeout(() => setRenderIn(true), 50);
@@ -25,12 +27,18 @@ export default function ChatbotPage() {
             setPromptInput("");
             setUploadedInputs([]);
             setChatStatus("fetching");
-            sendPrompt(promptInput.trim(), uploadedInputs).then((response) => {
-                console.log("AI Response:", response);
+
+            let currSessionId = sessionId;
+            if(messageFeed.length === 0) {
+                currSessionId = crypto.randomUUID();
+                setSessionId(currSessionId);
+            }
+
+            sendPrompt(promptInput.trim(), uploadedInputs, currSessionId).then((response) => {
                 setMessageFeed((prev) => [...prev, { type: "bot", content: response }]);
                 setChatStatus("idle");
             }).catch((error) => {
-                console.error("Error sending prompt:", error);
+                toast.error("Error sending prompt:", error);
                 setChatStatus("idle");
             });
         }

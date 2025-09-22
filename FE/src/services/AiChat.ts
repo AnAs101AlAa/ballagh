@@ -4,23 +4,15 @@ import {
   createEphemeralKP,
   encryptForServer,
   decryptServerResponse,
+  fetchServerPubKey,
 } from "../utils/cryptoClient";
-
 import { fileToBase64WithMime } from "../utils/formaters";
-// helper: convert File → base64 + mime
-
-
-// helper to fetch server pubkey
-async function fetchServerPubKey(): Promise<string> {
-  const resp = await axios.get("http://localhost:3000/api/server-pubkey");
-  return resp.data.x25519_pub as string;
-}
 
 /**
  * Sends encrypted prompt (+ optional files), receives encrypted response,
  * decrypts and returns it.
  */
-const sendGeminiRequest = async (prompt: string, files?: File[]) => {
+const sendGeminiRequest = async (prompt: string, files?: File[], sessionId?: string) => {
   await initSodium();
 
   // 1) create ephemeral KP (per-request)
@@ -42,7 +34,7 @@ const sendGeminiRequest = async (prompt: string, files?: File[]) => {
   // envelope = { ephemeral_pub, nonce, ciphertext, ts }
 
   // 5) send to backend
-  const resp = await axios.post("http://localhost:3000/api/gemini", envelope, {
+  const resp = await axios.post("http://localhost:3000/api/gemini", {...envelope, sessionId}, {
     headers: { "Content-Type": "application/json" },
   });
 
