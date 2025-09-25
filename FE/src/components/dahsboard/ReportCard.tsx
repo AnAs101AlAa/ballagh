@@ -26,9 +26,15 @@ export default function ReportCard({report}: {report: Report}) {
                     </span>
                 </p>
                 <p className="lg:text-[12px] md:text-[11px] text-[10px]">
-                    <span className="text-text-secondary">الموقع:</span>{" "}
-                    <span className="text-text-primary">{report.address}</span>
+                    <span className="text-text-secondary">التصنيف:</span>{" "}
+                    <span className="text-text-primary">{report.category}</span>
                 </p>
+                <div className="flex justify-between items-center">
+                    <p className="lg:text-[12px] md:text-[11px] text-[10px]">
+                        <span className="text-text-secondary">الموقع:</span>{" "}
+                        <span className="text-text-primary">{report.address}</span>
+                    </p>
+                </div>
             </div>
         </div>
     )
