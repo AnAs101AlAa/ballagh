@@ -1,9 +1,10 @@
 const express = require("express");
-const { sodium, serverKeyPair, fromB64 } = require("../crypto");
+const { sodium, serverKeyPair } = require("../cryptos/crypto");
 const pool = require("../db");
 const { loadMediaStore, saveMediaStore } = require("../mediaStore");
 const crypto = require("crypto");
-const decryptBody = require("../decryptBody");
+const decryptBody = require("../cryptos/decryptBody");
+const encryptForClient = require("../cryptos/encryptBody");
 
 const router = express.Router();
 
@@ -67,5 +68,33 @@ router.post("/submit-report", decryptBody, async (req, res) => {
     return res.status(500).json({ error: "Server error: " + (err.message || "unknown") });
   }
 });
+
+router.post("/reports", decryptBody, async (req, res) => {
+  try {
+    const { ephemeral_pub } = req.decrypted;
+    if (!ephemeral_pub) {
+      return res.status(400).json({ error: "Missing ephemeral_pub" });
+    }
+
+    const serverKeyPair = require("../cryptos/crypto").getServerKeyPair();
+
+    const clientPub = sodium.from_base64(ephemeral_pub, sodium.base64_variants.ORIGINAL);
+    const sessionKeys = sodium.crypto_kx_server_session_keys(
+      serverKeyPair.publicKey,
+      serverKeyPair.privateKey,
+      clientPub
+    );
+
+    const result = await pool.query("SELECT * FROM reports ORDER BY createdat DESC");
+
+    return res.json(
+      encryptForClient({ reports: result.rows }, sessionKeys, sodium)
+    );
+  } catch (err) {
+    console.error("Error in /api/reports:", err.message || err);
+    return res.status(500).json({ error: "Server error: " + (err.message || "unknown") });
+  }
+});
+
 
 module.exports = router;

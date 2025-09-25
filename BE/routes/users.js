@@ -2,7 +2,7 @@ const express = require("express");
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const decryptBody = require("../decryptBody");
+const decryptBody = require("../cryptos/decryptBody");
 const { sendOtpEmail } = require("../emailer");
 
 const otpStore = new Map();
@@ -30,11 +30,9 @@ router.post("/login", decryptBody, async (req, res) => {
     if (!valid)
       return res.status(401).json({ error: "Invalid credentials" });
 
-    // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore.set(username, { otp, expires: Date.now() + 5 * 60 * 1000 }); // 5 min expiry
+    otpStore.set(username, { otp, expires: Date.now() + 2 * 60 * 1000 });
 
-    // Get user's email from DB (assuming you have an email column)
     const emailResult = await pool.query(
       "SELECT email FROM users WHERE username = $1",
       [username]
@@ -64,12 +62,34 @@ router.post("/verify-otp", decryptBody, async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false,//process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 3600000, // 1 hour
   });
 
   res.json({ status: "success" });
 });
+
+router.get("/check-auth", (req, res) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ error: "لم يتم تسجيل الدخول" });
+  }
+
+  try {
+    res.json({ status: "valid" });
+  } catch (err) {
+    return res.status(401).json({ error: "انتهت صلاحية الجلسة أو الرمز غير صالح" });
+  }
+});
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [username, entry] of otpStore.entries()) {
+    if (now > entry.expires) {
+      otpStore.delete(username);
+    }
+  }
+}, 2 * 60 * 1000);
 
 module.exports = router;

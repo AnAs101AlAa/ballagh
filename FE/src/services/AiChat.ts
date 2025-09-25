@@ -6,12 +6,9 @@ import {
   decryptServerResponse,
   fetchServerPubKey,
 } from "../utils/cryptoClient";
+import sodium from "libsodium-wrappers";
 import { fileToBase64WithMime } from "../utils/formaters";
 
-/**
- * Sends encrypted prompt (+ optional files), receives encrypted response,
- * decrypts and returns it.
- */
 const sendGeminiRequest = async (prompt: string, files?: File[], sessionId?: string) => {
   await initSodium();
 
@@ -27,14 +24,15 @@ const sendGeminiRequest = async (prompt: string, files?: File[], sessionId?: str
     encodedFiles = await Promise.all(files.map(fileToBase64WithMime));
   }
 
-  const payload = { prompt, files: encodedFiles };
+  const payload = { prompt, files: encodedFiles, ephemeral_pub: 
+    (await sodium.to_base64(clientKP.publicKey, sodium.base64_variants.ORIGINAL))
+  };
 
   // 4) encrypt payload
   const envelope = await encryptForServer(payload, clientKP, serverPub);
-  // envelope = { ephemeral_pub, nonce, ciphertext, ts }
 
   // 5) send to backend
-  const resp = await axios.post("http://localhost:3000/api/gemini", {...envelope, sessionId}, {
+  const resp = await axios.post("http://localhost:3000/api/gemini", { ...envelope, sessionId }, {
     headers: { "Content-Type": "application/json" },
   });
 

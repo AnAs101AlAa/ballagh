@@ -1,10 +1,11 @@
 const express = require("express");
 const axios = require("axios");
-const { sodium, getServerKeyPair, b64, fromB64 } = require("../crypto");
+const { sodium, b64, getServerKeyPair } = require("../cryptos/crypto");
 const pool = require("../db");
 const conversations = require("../conversations");
 const chrono = require("chrono-node");
-const decryptBody = require("../decryptBody");
+const decryptBody = require("../cryptos/decryptBody");
+const encryptForClient = require("../cryptos/encryptBody");
 
 function parseSmartDate(input) {
   if (!input) return null;
@@ -17,7 +18,21 @@ const router = express.Router();
 router.post("/gemini", decryptBody, async (req, res) => {
   try {
     const payload = req.decrypted;
-    const { prompt, files } = payload;
+    const { prompt, files, sessionId } = payload;
+    
+    const { ephemeral_pub } = payload;
+    if (!ephemeral_pub) {
+      return res.status(400).json({ error: "Missing ephemeral_pub" });
+    }
+
+    const serverKeyPair = require("../cryptos/crypto").getServerKeyPair();
+
+    const clientPub = sodium.from_base64(ephemeral_pub, sodium.base64_variants.ORIGINAL);
+    const sessionKeys = sodium.crypto_kx_server_session_keys(
+      serverKeyPair.publicKey,
+      serverKeyPair.privateKey,
+      clientPub
+    );
 
     if (!prompt) {
       return res
@@ -164,28 +179,9 @@ router.post("/gemini", decryptBody, async (req, res) => {
       finalMessage = answer;
     }
 
-    // 8) Encrypt response
-    const responsePlain = sodium.from_string(
-      JSON.stringify({ answer: finalMessage })
-    );
-    const respNonce = sodium.randombytes_buf(
-      sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
-    );
-    const keyForEncryptingResponse = sessionKeys.sharedTx;
-
-    const responseCipher = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      responsePlain,
-      null,
-      null,
-      respNonce,
-      keyForEncryptingResponse
-    );
-
-    return res.json({
-      nonce: b64(respNonce),
-      ciphertext: b64(responseCipher),
-      ts: Math.floor(Date.now() / 1000),
-    });
+    return res.json(
+      encryptForClient({ answer: finalMessage }, sessionKeys, sodium)
+    );    
   } catch (err) {
     console.error(
       "Error in /api/gemini:",

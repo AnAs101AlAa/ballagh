@@ -18,6 +18,6 @@ export const reportSchema = z.object({
     ),
   address: z.string().min(1, "الموقع مطلوب"),
   category: z.enum(categories as [string, ...string[]], {
-    errorMap: () => ({ message: "يرجى اختيار تصنيف صحيح" }),
+    message: "يرجى اختيار تصنيف صحيح"
   }),
 });

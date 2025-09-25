@@ -42,8 +42,8 @@ export default function ChatbotPage() {
                 
                 setMessageFeed((prev) => [...prev, { type: "bot", content: response }]);
                 setChatStatus("idle");
-            }).catch((error) => {
-                toast.error("Error sending prompt:", error);
+            }).catch(() => {
+                toast.error("حدث خطأ أثناء الاتصال بالنموذج. حاول مرة أخرى.");
                 setChatStatus("idle");
             });
         }

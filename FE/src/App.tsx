@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import routes from './routes';
 import { Toaster } from "react-hot-toast";
+import LoggedInRoute from "./routing/ProtectedRoutes";
 
 function App() {
 
@@ -13,9 +14,25 @@ function App() {
         }}
       />
       <Routes>
-        {routes.map(route => (
-          <Route key={route.path} path={route.path} element={<route.element />} />
-        ))}
+        {routes.map(({path, Component, isProtected}) =>
+          isProtected ? (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <LoggedInRoute>
+                  <Component/>
+                </LoggedInRoute>
+              }
+            />
+          ) : Component ? (
+            <Route
+              key={path}
+              path={path}
+              element={<Component/>}
+            />
+          ) : null
+        )}
       </Routes>
     </BrowserRouter>
   )
