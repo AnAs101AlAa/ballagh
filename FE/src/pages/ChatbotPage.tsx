@@ -11,7 +11,7 @@ export default function ChatbotPage() {
     const { sendPrompt } = UseChatbot();
     const [promptInput, setPromptInput] = useState<string>("");
     const [uploadedInputs, setUploadedInputs] = useState<File[]>([]);
-    const [chatStatus, setChatStatus] = useState<"idle" | "typing" | "fetching">("idle");
+    const [chatStatus, setChatStatus] = useState<"idle" | "typing" | "fetching" | 'done'>("idle");
     const [messageFeed, setMessageFeed] = useState<{type: "user" | "bot", content: string}[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [renderIn, setRenderIn] = useState<boolean>(false);
@@ -35,6 +35,11 @@ export default function ChatbotPage() {
             }
 
             sendPrompt(promptInput.trim(), uploadedInputs, currSessionId).then((response) => {
+                if(response.includes("<REPORT_READY>")) {
+                    response = response.replace("<REPORT_READY>", "").trim();
+                    setChatStatus("done");
+                }
+                
                 setMessageFeed((prev) => [...prev, { type: "bot", content: response }]);
                 setChatStatus("idle");
             }).catch((error) => {

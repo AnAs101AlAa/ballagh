@@ -12,11 +12,15 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.12.1",
+    "bcryptjs": "^3.0.2",
+    "chrono-node": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "libsodium-wrappers": "^0.7.15",
+    "nodemailer": "^7.0.6",
     "path": "^0.12.7",
     "pg": "^8.16.3",
     "uuid": "^13.0.0"
