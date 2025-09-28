@@ -6,6 +6,7 @@ import { LuAudioLines } from "react-icons/lu";
 import UseChatbot from "../hooks/UseChatbot";
 import { FaXmark } from "react-icons/fa6";
 import toast from "react-hot-toast";
+import Button from "../components/Button";
 
 export default function ChatbotPage() {
     const { sendPrompt } = UseChatbot();
@@ -16,6 +17,7 @@ export default function ChatbotPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [renderIn, setRenderIn] = useState<boolean>(false);
     const [sessionId, setSessionId] = useState<string>("");
+    const [typingFinished, setTypingFinished] = useState<boolean>(false);
 
     useEffect(() => {
         setTimeout(() => setRenderIn(true), 50);
@@ -36,8 +38,9 @@ export default function ChatbotPage() {
 
             sendPrompt(promptInput.trim(), uploadedInputs, currSessionId).then((response) => {
                 if(response.includes("<REPORT_READY>")) {
-                    response = response.replace("<REPORT_READY>", "").trim();
+                    response = response.replace(/<REPORT_JSON>[\s\S]*?<\/REPORT_JSON>/, "").replace("<REPORT_READY>", "").trim();
                     setChatStatus("done");
+                    console.log("Report generation completed.");
                 }
                 
                 setMessageFeed((prev) => [...prev, { type: "bot", content: response }]);
@@ -72,7 +75,7 @@ export default function ChatbotPage() {
                     </div>
                     {messageFeed.map((message, index) => (
                         message.type === "bot" ? (
-                            <TypeOutText key={index} text={message.content} styles="" speed={20} />
+                            <TypeOutText key={index} text={message.content} styles="" speed={20} setIsFinished={() => setTypingFinished(true)} />
                         ) : (
                             <div dir="rtl" key={index} className={`py-3 px-4 rounded-2xl animate-fade-in bg-primary w-fit max-w-[90%] md:max-w-[70%] lg:max-w-1/2`}>
                                 {message.content}
@@ -81,7 +84,11 @@ export default function ChatbotPage() {
                     ))}
                     {chatStatus === "fetching" && <div className="animate-pulse">المساعد يفكر...</div>}
                 </div>
-                <div className={`bg-primary ${uploadedInputs.length > 0 ? "rounded-3xl" : "rounded-full"} py-2 px-3 w-full flex flex-col space-y-3 absolute bottom-5`}>
+                <div className={`${(chatStatus === "done" && typingFinished) ? "translate-y-0 z-10" : "translate-y-20 -z-50"} flex gap-3 items-center justify-center w-full absolute bottom-5 transition-all duration-500`}>
+                    <Button buttonText="إنشاء بلاغ جديد" onClick={() => window.location.reload()} type="primary" />
+                    <Button buttonText="العودة إلى الصفحة الرئيسية" onClick={() => window.location.href = "/"} type="primary" />
+                </div>
+                <div className={`bg-primary ${uploadedInputs.length > 0 ? "rounded-3xl" : "rounded-full"} ${(chatStatus === "done" && typingFinished) ? "translate-y-20 -z-50" : "translate-y-0 z-10"} py-2 px-3 w-full flex flex-col space-y-3 absolute bottom-5 transition-all duration-500`}>
                     {uploadedInputs.length > 0 && (
                         <div className="w-full flex space-x-3 overflow-x-auto my-scrollbar">
                             {uploadedInputs.map((file, index) => (
