@@ -28,7 +28,7 @@ const submitReport = async (reportData: Report, setStage: Dispatch<SetStateActio
         setStage("submitting");
         await new Promise((r) => setTimeout(r, 3000));
 
-        axios.post("http://localhost:3000/api/submit-report", envelope, {
+        axios.post("https://ballagh-production.up.railway.app/api/submit-report", envelope, {
             headers: { "Content-Type": "application/json" },
         }).then(() => {
             setStage("success");

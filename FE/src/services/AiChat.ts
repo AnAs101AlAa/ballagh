@@ -32,7 +32,7 @@ const sendGeminiRequest = async (prompt: string, files?: File[], sessionId?: str
   const envelope = await encryptForServer(payload, clientKP, serverPub);
 
   // 5) send to backend
-  const resp = await axios.post("http://localhost:3000/api/gemini", { ...envelope, sessionId }, {
+  const resp = await axios.post("https://ballagh-production.up.railway.app/api/gemini", { ...envelope, sessionId }, {
     headers: { "Content-Type": "application/json" },
   });
 

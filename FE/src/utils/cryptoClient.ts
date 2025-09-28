@@ -112,7 +112,7 @@ export async function decryptServerResponse(
 }
 
 async function fetchServerPubKey(): Promise<string> {
-  const resp = await axios.get("http://localhost:3000/api/server-pubkey");
+  const resp = await axios.get("https://ballagh-production.up.railway.app/api/server-pubkey");
   return resp.data.x25519_pub as string;
 }
 

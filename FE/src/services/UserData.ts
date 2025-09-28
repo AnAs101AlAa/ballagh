@@ -11,7 +11,7 @@ export async function secureLogin(username: string, password: string) {
 
   const envelope = await encryptForServer({ username, password }, clientKP, serverPub);
 
-  const res = await axios.post("http://localhost:3000/api/login", envelope);
+  const res = await axios.post("https://ballagh-production.up.railway.app/api/login", envelope);
 
   return res.data;
 }
@@ -25,13 +25,13 @@ export async function verifyOTP(username: string, otp: string) {
 
   const envelope = await encryptForServer({ username, otp }, clientKP, serverPub);
 
-  const res = await axios.post("http://localhost:3000/api/verify-otp", envelope, {withCredentials: true});
+  const res = await axios.post("https://ballagh-production.up.railway.app/api/verify-otp", envelope, {withCredentials: true});
 
   return res.data;
 }
 
 export async function checkAuth() {
-  await axios.get("http://localhost:3000/api/check-auth", { withCredentials: true });
+  await axios.get("https://ballagh-production.up.railway.app/api/check-auth", { withCredentials: true });
 }
 
 export async function fetchReports() {
@@ -51,7 +51,7 @@ export async function fetchReports() {
 
   // 5. Send POST request with encrypted envelope
   const resp = await axios.post(
-    "http://localhost:3000/api/reports",
+    "https://ballagh-production.up.railway.app/api/reports",
     envelope,
     { withCredentials: true }
   );
