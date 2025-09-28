@@ -11,6 +11,7 @@ export default function DashboardPage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(false)
     const [reports, setReports] = useState<Report[]>([])
+    const [displayedReports, setDisplayedReports] = useState<Report[]>([])
 
     useEffect(() => {
         if(isLoading) return
@@ -19,7 +20,7 @@ export default function DashboardPage() {
             try {
                 const reports = await fetchReports()
                 setReports(reports)
-                console.log(reports)
+                setDisplayedReports(reports)
             } catch (error) {
                 console.error("Error fetching reports:", error)
             } finally {
@@ -29,6 +30,19 @@ export default function DashboardPage() {
 
         loadReports()
     }, [])
+
+    useEffect(() => {
+        setDisplayedReports(() => {
+            let filteredReports = reports
+            if (selectedCategory && selectedCategory !== categories[0]) {
+                filteredReports = filteredReports.filter(report => report.category === selectedCategory)
+            }
+            if (searchTerm) {
+                filteredReports = filteredReports.filter(report => report.title.includes(searchTerm))
+            }
+            return filteredReports
+        })
+    }, [selectedCategory, searchTerm])
 
     return (
         <div className={`min-h-screen w-screen bg-background relative overflow-hidden flex items-center justify-center`}>
@@ -47,8 +61,10 @@ export default function DashboardPage() {
                 <div className="w-full h-full overflow-y-auto flex flex-col gap-4 py-2">
                     {isLoading ? (
                         <p className="text-text-secondary">جاري تحميل البلاغات...</p>
+                    ) : displayedReports.length > 0 ? (
+                        displayedReports.map((report) => <ReportCard key={report.id} report={report} />)
                     ) : (
-                        reports.map((report) => <ReportCard key={report.id} report={report} />)
+                        <p className="text-text-secondary">لا توجد بلاغات لعرضها</p>
                     )}
                 </div>
             </div>
